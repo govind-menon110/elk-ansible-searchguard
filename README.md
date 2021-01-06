@@ -1,1 +1,3 @@
-# elk-ansible-searchguard
+
+# Ansible playbook for Search Guard enabled ELK
+
