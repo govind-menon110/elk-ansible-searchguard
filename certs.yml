@@ -1,0 +1,88 @@
+- hosts: ["kibana"]
+  tasks:
+    - name: check if plugin already present
+      become: yes
+      stat:
+        path: /usr/share/kibana/plugins/searchguard
+      register: stat_result
+    - name: install the plugin
+      become: yes
+      become_user: root
+      shell: "/usr/share/kibana/bin/kibana-plugin install https://maven.search-guard.com/search-guard-kibana-plugin-release/com/floragunn/search-guard-kibana-plugin/7.10.1-48.0.0/search-guard-kibana-plugin-7.10.1-48.0.0.zip --allow-root"
+      when: not stat_result.stat.exists
+    - name: changing perms of plugin folder
+      become: yes
+      file:
+        path: /usr/share/kibana
+        state: directory
+        mode: '0774'
+        owner: root
+        group: kibana
+        recurse: yes
+    - name: making cert directory
+      become: yes
+      file:
+        path: /etc/kibana/certs
+        state: directory
+        owner: root
+        group: kibana
+        mode: '0774'
+        recurse: yes
+    - name: copying file with owner and permissions
+      become: yes
+      copy:
+        src: "{{ kibana_ca_cert }}"
+        dest: /etc/kibana/certs/root-ca.pem
+        owner: kibana
+        group: kibana
+        mode: 0644
+    - name: Check if the file already has an ansible managed block for xpack
+      become: yes
+      lineinfile:
+        path: /etc/kibana/kibana.yml
+        regexp: 'add xpack ANSIBLE MANAGED BLOCK'
+        state: absent
+      check_mode: yes
+      changed_when: false
+      register: out
+    - name: adding the lines for SG in the config file
+      become: yes
+      blockinfile: 
+        state: present
+        insertafter: EOF
+        dest: /etc/kibana/kibana.yml
+        marker: "# add xpack ANSIBLE MANAGED BLOCK"
+        content: |
+          xpack.security.enabled: false
+          searchguard.auth.type: "basicauth"
+          elasticsearch.requestHeadersWhitelist: ["Authorization", "sgtenant"]
+
+          elasticsearch.username: {{ kibana_es_user }}
+          elasticsearch.password: {{ kibana_password }}
+          elasticsearch.ssl.certificateAuthorities: /etc/kibana/certs/root-ca.pem
+          elasticsearch.ssl.verificationMode: certificate
+
+      when: not out.found
+    - name: making a config folder in /usr/share/kibana
+      become: yes
+      file:
+        state: directory
+        path: /usr/share/kibana/config
+        owner: root
+        group: kibana
+        mode: 0774
+    - name: copying kibana config .yml here
+      become: yes
+      copy:
+        remote_src: yes
+        src: /etc/kibana/kibana.yml
+        dest: /usr/share/kibana/config/kibana.yml
+        owner: root
+        group: kibana
+        mode: 0774
+    - name: restarting kibana service
+      become: yes
+      service: 
+        name: kibana.service
+        state: reloaded
+        enabled: yes

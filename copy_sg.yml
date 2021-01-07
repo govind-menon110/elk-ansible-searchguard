@@ -1,0 +1,60 @@
+- hosts: ["masters", "coordinating", "data"]
+  tasks:
+      - name: check if already downloaded
+        stat:
+          path: /home/ec2-user/search-guard-suite-plugin-7.10.1-48.0.0.zip
+        register: stat_result
+      - name: downloading plugin into home folder
+        uri:
+          dest: /home/ec2-user
+          validate_certs: no
+          url: https://maven.search-guard.com/search-guard-suite-release/com/floragunn/search-guard-suite-plugin/7.10.1-48.0.0/search-guard-suite-plugin-7.10.1-48.0.0.zip
+          method: GET
+          mode: 0666
+        when: not stat_result.stat.exists
+      - name: make the certs directory
+        become: true
+        file:
+          path: /etc/elasticsearch/certs
+          state: directory
+          mode: '0777'
+      - name: copy the certs to folder
+        become: true
+        copy:
+          src: "{{ es_common_pem_path }}"
+          dest: /etc/elasticsearch/certs/instance.pem
+          owner: elasticsearch
+          group: elasticsearch
+          mode: 0666
+      - name: copy the instance key to folder
+        become: true
+        copy:
+          src: "{{ es_common_key_path }}"
+          dest: /etc/elasticsearch/certs/instance.key
+          owner: elasticsearch
+          group: elasticsearch
+          mode: 0666
+      - name: copy the admin cert to folder
+        become: true
+        copy:
+          src: "{{ es_admin_pem_path }}"
+          dest: /etc/elasticsearch/certs/admin.pem
+          owner: elasticsearch
+          group: elasticsearch
+          mode: 0666
+      - name: copy the admin key to folder
+        become: true
+        copy:
+          src: "{{ es_admin_key_path }}"
+          dest: /etc/elasticsearch/certs/admin.key
+          owner: elasticsearch
+          group: elasticsearch
+          mode: 0666
+      - name: copy CA cert
+        become: true
+        copy:
+          src: "{{ es_ca_path }}"
+          dest: /etc/elasticsearch/certs/root-ca.pem
+          owner: elasticsearch
+          group: elasticsearch
+          mode: 0666

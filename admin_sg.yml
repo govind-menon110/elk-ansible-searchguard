@@ -1,0 +1,16 @@
+- hosts: ["masters", "coordinating", "data"]
+  tasks:
+    - name: change permissions of SG config
+      become: true
+      file:
+        path: /usr/share/elasticsearch/plugins/search-guard-7/tools/sgadmin.sh
+        owner: ec2-user
+        group: elasticsearch
+        mode: '0755'
+    - name: Initialize the SG config
+      become: true
+      environment:
+        JAVA_HOME: "/usr/share/elasticsearch/jdk"
+      shell: "/usr/share/elasticsearch/plugins/search-guard-7/tools/sgadmin.sh -cd /usr/share/elasticsearch/plugins/search-guard-7/sgconfig -cacert /etc/elasticsearch/certs/root-ca.pem -cert /etc/elasticsearch/certs/admin.pem -key /etc/elasticsearch/certs/admin.key -keypass {{ sg_transport_keypass }} -nhnv -cn {{ es_cluster_name }}"
+      run_once: true
+      ignore_errors: true

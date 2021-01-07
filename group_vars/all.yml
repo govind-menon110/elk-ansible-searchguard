@@ -1,0 +1,51 @@
+kibana_encryption_key: "fhjskloppd678ehkdfdlliverpoolfcr"
+kibana_es_user: "admin"
+kibana_password: "admin"
+kibana_version: "7.10.1"
+
+elastic_bootstrappass: "admin"
+elastic_superuser: "admin"
+elastic_superuserpass: "admin"
+
+logstash_userpass: "logstash"
+
+apm_userpass: "elastic"
+
+monitoring_userpass: "elastic"
+
+beats_userpass: "elastic"
+
+es_data_dir: "/es-data"
+
+es_master_heap_size: "15g"
+es_data_heap_size: "15g"
+es_coord_heap_size: "12g"
+es_cluster_name: "s3-access-logs"
+
+es_common_pem_path: "/[path-to-git-root-folder]/out/instance.pem"
+es_common_key_path: "/[path-to-git-root-folder]/out/instance.key"
+kibana_ca_cert: "/[path-to-git-root-folder]/out/root-ca.pem"
+es_admin_pem_path: "/[path-to-git-root-folder]/out/security.pem"
+es_admin_key_path: "/[path-to-git-root-folder]/out/security.key"
+es_ca_path: "/[path-to-git-root-folder]/out/root-ca.pem"
+
+searchguard_es_plugin: "/[path-to-folder-on-ansible-master]/search-guard-suite-plugin-7.zip"
+searchguard_kibana_plugin: "/[path-to-folder-on-ansible-master]/searchguard-kibana-7.10.1-48.0.0.zip"
+
+sg_transport_keyfile: certs/instance.key
+sg_transport_pemfile: certs/instance.pem
+sg_transport_keypass: changeit
+
+sg_http_enabled: true
+sg_http_keyfile: certs/instance.key
+sg_http_pemfile: certs/instance.pem
+sg_http_keypass: changeit
+
+sg_ssl_ver: false
+
+admin_keypass: changeit
+admin_trustpass: changeit
+
+sg_trusted_cas_transport: /etc/elasticsearch/certs/root-ca.pem
+sg_trusted_cas_http: /etc/elasticsearch/certs/root-ca.pem
+sg_admin_dn: CN=security.example.in,OU=Ops,O=example\, tech pvt. ltd.,DC=example,DC=in

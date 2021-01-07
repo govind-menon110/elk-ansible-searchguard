@@ -1,0 +1,24 @@
+ca:
+   root:
+      dn: "CN=root.ca.example.in,OU=CA,O=example\\, tech pvt. ltd.,DC=example,DC=in"
+      keysize: 2048
+      pkPassword: none
+      validityDays: 36500
+      file: root-ca.pem
+defaults:
+  validityDays: 36500
+  pkPassword: changeit
+  nodesDn:
+    - CN=instance.example.in,OU=Ops,O=example\\, tech pvt. ltd.,DC=example,DC=in"
+  nodeOid: "1.2.3.4.5.5"
+  httpsEnabled: true
+  reuseTransportCertificatesForHttp: true
+nodes:
+  - name: instance
+    dn: "CN=instance.example.in,OU=Ops,O=example\\, tech pvt. ltd.,DC=example,DC=in"
+clients:
+  - name: others
+    dn: "CN=others.example.in,OU=Ops,O=example\\, tech pvt. ltd.,DC=example,DC=in"
+  - name: security
+    dn: "CN=security.example.in,OU=Ops,O=example\\, tech pvt. ltd.,DC=example,DC=in"
+    admin: true
